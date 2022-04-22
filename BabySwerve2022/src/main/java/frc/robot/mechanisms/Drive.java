@@ -4,46 +4,53 @@
 
 package frc.robot.mechanisms;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.DriveConstants;
 import frc.robot.commands.Driving;
+import frc.robot.commands.JoystickToSwerve;
 import frc.robot.subsystems.DriveTrainSubsystem;
 import frc.robot.subsystems.SwerveModule;
+import frc.robot.subsystems.SwerveSubsystem;
 
 /** Add your docs here. */
 public class Drive {
-    SwerveModule mod0;
-    SwerveModule mod1;
-    SwerveModule mod2;
-    SwerveModule mod3;
+    SwerveModule bottomRight;
+    SwerveModule topRight;
+    SwerveModule bottomLeft;
+    SwerveModule topLeft;
     private DriveTrainSubsystem driveTrainSubsystem;
+    private SwerveSubsystem swerveSubsystem;
     private Driving driving;
+    AHRS gyro;
     
-    public Drive(){
+    public Drive(AHRS gyro){
+        this.gyro = gyro;
         Joystick driver = new Joystick(0);
+        topRight = new SwerveModule(1, 2, 0, DriveConstants.kFrontRightDriveAbsoluteEncoderOffsetRad, false);
 
-        CANSparkMax speedMotor0 = new CANSparkMax(1, MotorType.kBrushless);
-        CANSparkMax angleMotor0 = new CANSparkMax(2,MotorType.kBrushless);
-        mod0 = new SwerveModule(speedMotor0, angleMotor0, 0, 0, false);
+        topLeft = new SwerveModule(3, 4, 1, DriveConstants.kFrontLeftDriveAbsoluteEncoderOffsetRad, false);
 
-        CANSparkMax speedMotor1 = new CANSparkMax(3, MotorType.kBrushless);
-        CANSparkMax angleMotor1 = new CANSparkMax(4,MotorType.kBrushless);
-        mod1 = new SwerveModule(speedMotor1, angleMotor1, 1, 0, false);
+        bottomLeft = new SwerveModule(5, 6, 2, DriveConstants.kBackLeftDriveAbsoluteEncoderOffsetRad, false);
 
-        CANSparkMax speedMotor2 = new CANSparkMax(5, MotorType.kBrushless);
-        CANSparkMax angleMotor2 = new CANSparkMax(6,MotorType.kBrushless);
-        mod2 = new SwerveModule(speedMotor2, angleMotor2, 2, 0, false);
+        bottomRight = new SwerveModule(7, 8, 3, DriveConstants.kBackRightDriveAbsoluteEncoderOffsetRad, false);
 
-        CANSparkMax speedMotor3 = new CANSparkMax(7, MotorType.kBrushless);
-        CANSparkMax angleMotor3 = new CANSparkMax(8,MotorType.kBrushless);
-        mod3 = new SwerveModule(speedMotor3, angleMotor3, 3, 0, false);
+        //driveTrainSubsystem = new DriveTrainSubsystem(mod0,mod1,mod2,mod3);
+        swerveSubsystem = new SwerveSubsystem(bottomRight, topRight, bottomLeft, topLeft, gyro);
+        swerveSubsystem.setDefaultCommand(new JoystickToSwerve(swerveSubsystem, 
+            () -> -driver.getRawAxis(1), 
+            () -> -driver.getRawAxis(2), 
+            () -> -driver.getRawAxis(4), 
+            () -> !driver.getRawButton(1)
+        ));
+        
+        new JoystickButton(driver, 2).whenPressed(() -> swerveSubsystem.zeroHeading());
 
-        driveTrainSubsystem = new DriveTrainSubsystem(mod0,mod1,mod2,mod3);
 
-        driving = new Driving(driveTrainSubsystem, driver);
-        driveTrainSubsystem.setDefaultCommand(driving);
+        //driving = new Driving(driveTrainSubsystem, driver);
+        //driveTrainSubsystem.setDefaultCommand(driving);
 
     }
 }
