@@ -29,20 +29,20 @@ public class Drive {
     public Drive(AHRS gyro){
         this.gyro = gyro;
         Joystick driver = new Joystick(0);
-        topRight = new SwerveModule(1, 2, 0, DriveConstants.kFrontRightDriveAbsoluteEncoderOffsetRad, false);
+        topRight = new SwerveModule(DriveConstants.kFrontRightDriveMotorPort, DriveConstants.kFrontRightTurningMotorPort, DriveConstants.kFrontRightDriveAbsoluteEncoderPort, DriveConstants.kFrontRightDriveAbsoluteEncoderOffsetRad, false);
 
-        topLeft = new SwerveModule(3, 4, 1, DriveConstants.kFrontLeftDriveAbsoluteEncoderOffsetRad, false);
+        topLeft = new SwerveModule(DriveConstants.kFrontLeftDriveMotorPort, DriveConstants.kFrontLeftTurningMotorPort, DriveConstants.kFrontLeftDriveAbsoluteEncoderPort, DriveConstants.kFrontLeftDriveAbsoluteEncoderOffsetRad, false);
 
-        bottomLeft = new SwerveModule(5, 6, 2, DriveConstants.kBackLeftDriveAbsoluteEncoderOffsetRad, false);
+        bottomLeft = new SwerveModule(DriveConstants.kBackLeftDriveMotorPort, DriveConstants.kBackLeftTurningMotorPort, DriveConstants.kBackLeftDriveAbsoluteEncoderPort, DriveConstants.kBackLeftDriveAbsoluteEncoderOffsetRad, true);
 
-        bottomRight = new SwerveModule(7, 8, 3, DriveConstants.kBackRightDriveAbsoluteEncoderOffsetRad, false);
+        bottomRight = new SwerveModule(DriveConstants.kBackRightDriveMotorPort, DriveConstants.kBackRightTurningMotorPort, DriveConstants.kBackRightDriveAbsoluteEncoderPort, DriveConstants.kBackRightDriveAbsoluteEncoderOffsetRad, false);
 
         //driveTrainSubsystem = new DriveTrainSubsystem(mod0,mod1,mod2,mod3);
         swerveSubsystem = new SwerveSubsystem(bottomRight, topRight, bottomLeft, topLeft, gyro);
         swerveSubsystem.setDefaultCommand(new JoystickToSwerve(swerveSubsystem, 
+            () -> driver.getRawAxis(0), 
             () -> -driver.getRawAxis(1), 
-            () -> -driver.getRawAxis(2), 
-            () -> -driver.getRawAxis(4), 
+            () -> driver.getRawAxis(4), 
             () -> !driver.getRawButton(1)
         ));
         

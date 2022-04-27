@@ -11,8 +11,17 @@ import edu.wpi.first.math.util.Units;
 /** Add your docs here. */
 public class ModuleConstants {
 
+    // neo 550 sysid values
+    public static final double kSC = 0.55641;
+    public static final double kVC = 0.064889;
+    public static final double kAC = 0.0025381;
+
+    public static double kS = kSC / 12;
+    public static double kV = kVC / 60 / 1 / (12 - kS);
+    public static double kA = kAC / 60 / 1 / (12 - kS);
+
     // pid values for the neo 550
-    public static final double kPTurning = 0;
+    public static final double kPTurning = 0.052037 * 1.5;
     public static final double kITurning = 0;
     public static final double kDTurning = 0;
 

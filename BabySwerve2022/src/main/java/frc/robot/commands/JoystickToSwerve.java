@@ -36,7 +36,7 @@ public class JoystickToSwerve extends CommandBase {
     this.yLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxAccelerationUnitsPerSecond);
     this.turnLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxAngularAccelerationUnitsPerSecond);
     
-    addRequirements(swerveSubsystem);
+    addRequirements(this.swerveSubsystem);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 

@@ -66,9 +66,10 @@ public class SwerveModule extends SubsystemBase {
     turningController = new ProfiledPIDController(
       ModuleConstants.kPTurning, 
       ModuleConstants.kITurning, 
-      ModuleConstants.kDTurning, 
-      new TrapezoidProfile.Constraints(5, 2)
+      ModuleConstants.kDTurning,
+      new TrapezoidProfile.Constraints(10, 10)
     );
+
     turningController.enableContinuousInput(-Math.PI, Math.PI);
 
     resetEncoders();
@@ -120,7 +121,9 @@ public class SwerveModule extends SubsystemBase {
 
     state = SwerveModuleState.optimize(state, getState().angle);
     driveMotor.set(state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
-    turningMotor.set(turningController.calculate(getTurningPosition(),state.angle.getRadians()));
+    double turnPow = turningController.calculate(getTurningPosition(),state.angle.getRadians());
+    // adding ks to get swerve moving
+    turningMotor.set(turnPow + (Math.signum(turnPow) * ModuleConstants.kS));
     SmartDashboard.putString("Swerve [" + absoluteEncoder.getChannel() + "] state", state.toString());
   }
 
@@ -130,7 +133,7 @@ public class SwerveModule extends SubsystemBase {
   }
 
   public void resetEncoders(){
-    driveEncoder.setPositionConversionFactor(0);
+    driveEncoder.setPosition(0);
     turningEncoder.setPosition(getAbsoluteEncoderRad());
   }
 
@@ -158,36 +161,11 @@ public class SwerveModule extends SubsystemBase {
     return Math.pow(fin, 1.5);
   }
 
-  public double getAbsRadAngle(){
-    // gets voltage, then converts to radians then shifts range from (0,PI) to (-PI,PI)
-    return absoluteEncoder.getAverageVoltage() * ModuleConstants.voltsToRadians - Math.PI;
-  }
-
-  public double getAbsDegreeAngle(){
-    // guessing how many volts are in a rotation, between 4.8-4.9
-    return absoluteEncoder.getAverageVoltage() * ModuleConstants.voltsToDegrees;
-  }
-
-  public static double continuousMinMax(double input){
-    if(input > Math.PI){
-      input -= Math.PI;
-    }else if(input < -Math.PI){
-      input += Math.PI;
-    }
-    return input;
-  }
-
   double greatestVal = 0;
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Swerve: " + absoluteEncoderPort, this.getRawEncoderVolt());
-    SmartDashboard.putNumber("Swerve Angle: " + absoluteEncoderPort, this.getAbsDegreeAngle());
-    double currVal = this.getRawEncoderVolt();
-    if(currVal > greatestVal){
-      greatestVal = currVal;
-    }
-
-    SmartDashboard.putNumber("Greatest Volt", greatestVal);
+    SmartDashboard.putNumber("Swerve: " + absoluteEncoderPort, this.getTurningPosition());
+    SmartDashboard.putNumber("Swerve Angle: " + absoluteEncoderPort, this.getAbsoluteEncoderRad());
     // This method will be called once per scheduler run
   }
 }

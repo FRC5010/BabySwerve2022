@@ -31,10 +31,10 @@ public class DriveConstants {
     public static final int kFrontRightTurningMotorPort = 8;
     public static final int kBackRightTurningMotorPort = 6;
 
-    public static final boolean kFrontLeftTurningEncoderReversed = true;
-    public static final boolean kBackLeftTurningEncoderReversed = true;
     public static final boolean kFrontRightTurningEncoderReversed = true;
     public static final boolean kBackRightTurningEncoderReversed = true;
+    public static final boolean kFrontLeftTurningEncoderReversed = true;
+    public static final boolean kBackLeftTurningEncoderReversed = true;
 
     public static final boolean kFrontLeftDriveEncoderReversed = true;
     public static final boolean kBackLeftDriveEncoderReversed = true;
@@ -46,15 +46,16 @@ public class DriveConstants {
     public static final int kFrontRightDriveAbsoluteEncoderPort = 3;
     public static final int kBackRightDriveAbsoluteEncoderPort = 2;
 
-    public static final boolean kFrontLeftDriveAbsoluteEncoderReversed = false;
-    public static final boolean kBackLeftDriveAbsoluteEncoderReversed = false;
     public static final boolean kFrontRightDriveAbsoluteEncoderReversed = false;
     public static final boolean kBackRightDriveAbsoluteEncoderReversed = false;
+    public static final boolean kFrontLeftDriveAbsoluteEncoderReversed = false;
+    public static final boolean kBackLeftDriveAbsoluteEncoderReversed = false;
 
-    public static final double kFrontLeftDriveAbsoluteEncoderOffsetRad = -0.254;
-    public static final double kBackLeftDriveAbsoluteEncoderOffsetRad = -1.252;
-    public static final double kFrontRightDriveAbsoluteEncoderOffsetRad = -1.816;
-    public static final double kBackRightDriveAbsoluteEncoderOffsetRad = -4.811;
+
+    public static final double kFrontLeftDriveAbsoluteEncoderOffsetRad = 3.78; // 0 + (Math.PI/4); //5.3 - 2 * Math.PI; //-0.254;
+    public static final double kBackLeftDriveAbsoluteEncoderOffsetRad = 2.09; // 2.12; //3.69 - 2 * Math.PI; //-1.252;
+    public static final double kBackRightDriveAbsoluteEncoderOffsetRad = 4.65;// 1.51; //-4.811;
+    public static final double kFrontRightDriveAbsoluteEncoderOffsetRad = 4.44;//1.31; //9.1 - 2 * Math.PI; //-1.816;
 
     public static final double kPhysicalMaxSpeedMetersPerSecond = 5;
     public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 2 * 2 * Math.PI;

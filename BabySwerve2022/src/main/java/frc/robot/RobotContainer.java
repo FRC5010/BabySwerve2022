@@ -9,6 +9,8 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.SerialPort.Port;
+import edu.wpi.first.wpilibj.SerialPort.StopBits;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.mechanisms.Drive;
 
@@ -25,7 +27,7 @@ public class RobotContainer {
   AHRS gyro;
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    gyro = new AHRS(SPI.Port.kMXP);
+    gyro = new AHRS(Port.kMXP);
     drive = new Drive(gyro);
     // Configure the button bindings
     configureButtonBindings();
