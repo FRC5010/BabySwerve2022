@@ -9,40 +9,36 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.DriveConstants;
-import frc.robot.commands.Driving;
 import frc.robot.commands.JoystickToSwerve;
-import frc.robot.subsystems.DriveTrainSubsystem;
 import frc.robot.subsystems.SwerveModule;
 import frc.robot.subsystems.SwerveSubsystem;
 
 /** Add your docs here. */
 public class Drive {
-    SwerveModule bottomRight;
-    SwerveModule topRight;
-    SwerveModule bottomLeft;
-    SwerveModule topLeft;
-    private DriveTrainSubsystem driveTrainSubsystem;
+    SwerveModule backRight;
+    SwerveModule frontRight;
+    SwerveModule backLeft;
+    SwerveModule frontLeft;
     private SwerveSubsystem swerveSubsystem;
-    private Driving driving;
     AHRS gyro;
     
     public Drive(AHRS gyro){
         this.gyro = gyro;
         Joystick driver = new Joystick(0);
-        topRight = new SwerveModule(DriveConstants.kFrontRightDriveMotorPort, DriveConstants.kFrontRightTurningMotorPort, DriveConstants.kFrontRightDriveAbsoluteEncoderPort, DriveConstants.kFrontRightDriveAbsoluteEncoderOffsetRad, false);
+        frontRight = new SwerveModule(DriveConstants.kFrontRightDriveMotorPort, DriveConstants.kFrontRightTurningMotorPort, DriveConstants.kFrontRightDriveAbsoluteEncoderPort, DriveConstants.kFrontRightDriveAbsoluteEncoderOffsetRad, DriveConstants.kFrontRightDriveEncoderReversed, DriveConstants.kFrontRightTurningEncoderReversed);
 
-        topLeft = new SwerveModule(DriveConstants.kFrontLeftDriveMotorPort, DriveConstants.kFrontLeftTurningMotorPort, DriveConstants.kFrontLeftDriveAbsoluteEncoderPort, DriveConstants.kFrontLeftDriveAbsoluteEncoderOffsetRad, false);
+        frontLeft = new SwerveModule(DriveConstants.kFrontLeftDriveMotorPort, DriveConstants.kFrontLeftTurningMotorPort, DriveConstants.kFrontLeftDriveAbsoluteEncoderPort, DriveConstants.kFrontLeftDriveAbsoluteEncoderOffsetRad, DriveConstants.kFrontLeftDriveEncoderReversed, DriveConstants.kFrontLeftTurningEncoderReversed);
 
-        bottomLeft = new SwerveModule(DriveConstants.kBackLeftDriveMotorPort, DriveConstants.kBackLeftTurningMotorPort, DriveConstants.kBackLeftDriveAbsoluteEncoderPort, DriveConstants.kBackLeftDriveAbsoluteEncoderOffsetRad, true);
+        backLeft = new SwerveModule(DriveConstants.kBackLeftDriveMotorPort, DriveConstants.kBackLeftTurningMotorPort, DriveConstants.kBackLeftDriveAbsoluteEncoderPort, DriveConstants.kBackLeftDriveAbsoluteEncoderOffsetRad, DriveConstants.kBackLeftDriveEncoderReversed, DriveConstants.kBackLeftTurningEncoderReversed);
 
-        bottomRight = new SwerveModule(DriveConstants.kBackRightDriveMotorPort, DriveConstants.kBackRightTurningMotorPort, DriveConstants.kBackRightDriveAbsoluteEncoderPort, DriveConstants.kBackRightDriveAbsoluteEncoderOffsetRad, false);
+        backRight = new SwerveModule(DriveConstants.kBackRightDriveMotorPort, DriveConstants.kBackRightTurningMotorPort, DriveConstants.kBackRightDriveAbsoluteEncoderPort, DriveConstants.kBackRightDriveAbsoluteEncoderOffsetRad, DriveConstants.kBackRightDriveEncoderReversed, DriveConstants.kBackRightTurningEncoderReversed);
 
         //driveTrainSubsystem = new DriveTrainSubsystem(mod0,mod1,mod2,mod3);
-        swerveSubsystem = new SwerveSubsystem(bottomRight, topRight, bottomLeft, topLeft, gyro);
+        swerveSubsystem = new SwerveSubsystem(frontLeft, backLeft, frontRight, backRight, gyro);
         swerveSubsystem.setDefaultCommand(new JoystickToSwerve(swerveSubsystem, 
-            () -> driver.getRawAxis(0), 
             () -> -driver.getRawAxis(1), 
-            () -> driver.getRawAxis(4), 
+            () -> driver.getRawAxis(0), 
+            () -> -driver.getRawAxis(4), 
             () -> !driver.getRawButton(1)
         ));
         

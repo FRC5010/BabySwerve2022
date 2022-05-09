@@ -38,18 +38,30 @@ public class SwerveModule extends SubsystemBase {
   private RelativeEncoder turningEncoder;
   private RelativeEncoder driveEncoder;
 
-  private final boolean absouluteEncoderReversed;
+  private final boolean drivingEncoderReversed;
+  private final boolean absoluteEncoderReversed;
+  private final boolean turningEncoderReversed;
   private final double absoluteEncoderOffsetRad;
 
   private double angleSetPoint;
 
-  public SwerveModule(int driveID, int turningID ,int absEncoderPort, double radOffset, boolean reversed) {
-    this.driveMotor = new CANSparkMax(driveID, MotorType.kBrushless);
-    this.turningMotor = new CANSparkMax(turningID, MotorType.kBrushless);
-
+  public SwerveModule(int driveID, int turningID ,int absEncoderPort, double radOffset, boolean driveReversed, boolean turningReversed) {
+    
     this.absoluteEncoderPort = absEncoderPort;
     absoluteEncoderOffsetRad = radOffset;
-    absouluteEncoderReversed = reversed;
+    absoluteEncoderReversed = turningReversed;
+    turningEncoderReversed = turningReversed;
+    drivingEncoderReversed = driveReversed;
+    
+    
+    this.driveMotor = new CANSparkMax(driveID, MotorType.kBrushless);
+    driveMotor.setInverted(drivingEncoderReversed);
+    this.turningMotor = new CANSparkMax(turningID, MotorType.kBrushless);
+    turningMotor.setInverted(turningEncoderReversed);
+    
+
+    
+    
     
     this.turningEncoder = turningMotor.getEncoder();
     this.driveEncoder = driveMotor.getEncoder();
@@ -67,7 +79,7 @@ public class SwerveModule extends SubsystemBase {
       ModuleConstants.kPTurning, 
       ModuleConstants.kITurning, 
       ModuleConstants.kDTurning,
-      new TrapezoidProfile.Constraints(10, 10)
+      new TrapezoidProfile.Constraints(40, 40)
     );
 
     turningController.enableContinuousInput(-Math.PI, Math.PI);
@@ -106,7 +118,7 @@ public class SwerveModule extends SubsystemBase {
     double angle = absoluteEncoder.getVoltage() / RobotController.getVoltage5V();
     angle *= 2 * Math.PI;
     angle -= absoluteEncoderOffsetRad;
-    return angle *= (absouluteEncoderReversed ? -1.0 : 1.0);
+    return angle *= (absoluteEncoderReversed ? -1.0 : 1.0);
   }
 
   public SwerveModuleState getState(){

@@ -15,18 +15,19 @@ import frc.robot.DriveConstants;
 
 public class SwerveSubsystem extends SubsystemBase {
   /** Creates a new SwerveSubsystem. */
-  private SwerveModule swerve0;
-  private SwerveModule swerve1;
-  private SwerveModule swerve2;
-  private SwerveModule swerve3;
+  private SwerveModule backRight;
+  private SwerveModule frontRight;
+  private SwerveModule backLeft;
+  private SwerveModule frontLeft;
 
   private AHRS gyro;
 
-  public SwerveSubsystem(SwerveModule bottomRight,SwerveModule topRight,SwerveModule bottomLeft,SwerveModule topLeft, AHRS gyro) {
-    this.swerve0 = bottomRight;
-    this.swerve1 = topRight;
-    this.swerve2 = bottomLeft;
-    this.swerve3 = topLeft;
+  public SwerveSubsystem(SwerveModule frontLeft,SwerveModule backLeft,SwerveModule frontRight,SwerveModule backRight, AHRS gyro) {
+    this.backRight = backRight;
+    this.frontRight = frontRight;
+    this.backLeft = backLeft;
+    this.frontLeft = frontLeft;
+
     this.gyro = gyro;
 
     new Thread(() -> {
@@ -57,17 +58,17 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public void stopModules(){
-    swerve0.stop();
-    swerve1.stop();
-    swerve2.stop();
-    swerve3.stop();
+    backRight.stop();
+    frontRight.stop();
+    backLeft.stop();
+    frontLeft.stop();
   }
 
   public void setModuleStates(SwerveModuleState[] desiredStates){
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
-    swerve0.setDesiredState(desiredStates[0]);
-    swerve1.setDesiredState(desiredStates[1]);
-    swerve2.setDesiredState(desiredStates[2]);
-    swerve3.setDesiredState(desiredStates[3]);
+    frontLeft.setDesiredState(desiredStates[0]);
+    frontRight.setDesiredState(desiredStates[1]);
+    backLeft.setDesiredState(desiredStates[2]);
+    backRight.setDesiredState(desiredStates[3]);
   }
 }
