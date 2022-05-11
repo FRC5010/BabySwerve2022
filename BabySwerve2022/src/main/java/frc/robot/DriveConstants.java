@@ -17,8 +17,8 @@ public class DriveConstants {
     // Distance between front and back wheels
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
             new Translation2d(-kWheelBase / 2, kTrackWidth / 2), // top left
-            new Translation2d(-kWheelBase / 2, -kTrackWidth / 2), // bottom left
             new Translation2d(kWheelBase / 2, kTrackWidth / 2), // top right
+            new Translation2d(-kWheelBase / 2, -kTrackWidth / 2), // bottom left
             new Translation2d(kWheelBase / 2, -kTrackWidth / 2)); // bottom right
      
 

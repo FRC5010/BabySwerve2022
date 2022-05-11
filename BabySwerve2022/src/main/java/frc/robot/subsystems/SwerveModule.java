@@ -58,11 +58,7 @@ public class SwerveModule extends SubsystemBase {
     driveMotor.setInverted(drivingEncoderReversed);
     this.turningMotor = new CANSparkMax(turningID, MotorType.kBrushless);
     turningMotor.setInverted(turningEncoderReversed);
-    
 
-    
-    
-    
     this.turningEncoder = turningMotor.getEncoder();
     this.driveEncoder = driveMotor.getEncoder();
     this.absoluteEncoder = new AnalogInput(absEncoderPort);
@@ -133,7 +129,8 @@ public class SwerveModule extends SubsystemBase {
 
     state = SwerveModuleState.optimize(state, getState().angle);
     driveMotor.set(state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
-    double turnPow = turningController.calculate(getTurningPosition(),state.angle.getRadians());
+    double turnPow = turningController.calculate(getAbsoluteEncoderRad(),state.angle.getRadians());
+    // getTurningPosition()
     // adding ks to get swerve moving
     turningMotor.set(turnPow + (Math.signum(turnPow) * ModuleConstants.kS));
     SmartDashboard.putString("Swerve [" + absoluteEncoder.getChannel() + "] state", state.toString());
