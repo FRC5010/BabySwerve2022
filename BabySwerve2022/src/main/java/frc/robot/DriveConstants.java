@@ -52,13 +52,18 @@ public class DriveConstants {
     public static final boolean kFrontLeftDriveAbsoluteEncoderReversed = false;
     public static final boolean kBackLeftDriveAbsoluteEncoderReversed = false;
 
-    public static final double kFrontLeftDriveAbsoluteEncoderOffsetRad = 3.84; // 0 + (Math.PI/4); //5.3 - 2 * Math.PI; //-0.254;
+    // public static final double kFrontLeftDriveAbsoluteEncoderOffsetRad = .64; // 0 + (Math.PI/4); //5.3 - 2 * Math.PI; //-0.254;
+    // public static final double kBackLeftDriveAbsoluteEncoderOffsetRad = 3.66; // 2.12; //3.69 - 2 * Math.PI; //-1.252;
+    // public static final double kBackRightDriveAbsoluteEncoderOffsetRad = 4.65;// 1.51; //-4.811;
+    // public static final double kFrontRightDriveAbsoluteEncoderOffsetRad = 1.298;//1.31; //9.1 - 2 * Math.PI; //-1.816;
+
+    public static final double kFrontLeftDriveAbsoluteEncoderOffsetRad = 3.5; // 0 + (Math.PI/4); //5.3 - 2 * Math.PI; //-0.254;
     public static final double kBackLeftDriveAbsoluteEncoderOffsetRad = 2.11; // 2.12; //3.69 - 2 * Math.PI; //-1.252;
-    public static final double kBackRightDriveAbsoluteEncoderOffsetRad = 4.51; // 1.51; //-4.811;
-    public static final double kFrontRightDriveAbsoluteEncoderOffsetRad = 4.71; //1.31; //9.1 - 2 * Math.PI; //-1.816;
+    public static final double kBackRightDriveAbsoluteEncoderOffsetRad = 6.28; //4.51; // 1.51; //-4.811;
+    public static final double kFrontRightDriveAbsoluteEncoderOffsetRad = 2.9;//4.71; //1.31; //9.1 - 2 * Math.PI; //-1.816;
 
     public static final double kPhysicalMaxSpeedMetersPerSecond = 5;
-    public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 2 * 2 * Math.PI;
+    public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 4 * Math.PI;
 
     public static final double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond / 4;
     public static final double kTeleDriveMaxAngularSpeedRadiansPerSecond = kPhysicalMaxAngularSpeedRadiansPerSecond / 4;

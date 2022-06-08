@@ -5,11 +5,10 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -17,7 +16,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.DriveConstants;
 import frc.robot.ModuleConstants;
@@ -129,7 +127,7 @@ public class SwerveModule extends SubsystemBase {
 
     state = SwerveModuleState.optimize(state, getState().angle);
     driveMotor.set(state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
-    double turnPow = turningController.calculate(getAbsoluteEncoderRad(),state.angle.getRadians());
+    double turnPow = turningController.calculate(getTurningPosition(),state.angle.getRadians());
     // getTurningPosition()
     // adding ks to get swerve moving
     turningMotor.set(turnPow + (Math.signum(turnPow) * ModuleConstants.kS));
