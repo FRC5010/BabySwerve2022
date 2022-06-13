@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -39,14 +40,14 @@ public class SwerveModule extends SubsystemBase {
   private final boolean drivingEncoderReversed;
   private final boolean absoluteEncoderReversed;
   private final boolean turningEncoderReversed;
-  private final double absoluteEncoderOffsetRad;
+  private final String absoluteEncoderOffsetRadKey;
 
   private double angleSetPoint;
 
-  public SwerveModule(int driveID, int turningID ,int absEncoderPort, double radOffset, boolean driveReversed, boolean turningReversed) {
+  public SwerveModule(int driveID, int turningID ,int absEncoderPort, String radOffsetKey, boolean driveReversed, boolean turningReversed) {
     
     this.absoluteEncoderPort = absEncoderPort;
-    absoluteEncoderOffsetRad = radOffset;
+    absoluteEncoderOffsetRadKey = radOffsetKey;
     absoluteEncoderReversed = turningReversed;
     turningEncoderReversed = turningReversed;
     drivingEncoderReversed = driveReversed;
@@ -111,7 +112,7 @@ public class SwerveModule extends SubsystemBase {
   public double getAbsoluteEncoderRad(){
     double angle = absoluteEncoder.getVoltage() / RobotController.getVoltage5V();
     angle *= 2 * Math.PI;
-    angle -= absoluteEncoderOffsetRad;
+    angle -= Preferences.getDouble(absoluteEncoderOffsetRadKey, 0);
     return angle *= (absoluteEncoderReversed ? -1.0 : 1.0);
   }
 

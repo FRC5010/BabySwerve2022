@@ -7,6 +7,9 @@ package frc.robot.mechanisms;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Preferences;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.DriveConstants;
 import frc.robot.commands.JoystickToSwerve;
@@ -23,15 +26,30 @@ public class Drive {
     AHRS gyro;
     
     public Drive(AHRS gyro){
+
+        if(!Preferences.containsKey(DriveConstants.kBackLeftDriveAbsoluteEncoderOffsetRadKey)){
+            Preferences.setDouble(DriveConstants.kBackLeftDriveAbsoluteEncoderOffsetRadKey, DriveConstants.kBackLeftDriveAbsoluteEncoderOffsetRad);    
+        }
+        if(!Preferences.containsKey(DriveConstants.kBackRightDriveAbsoluteEncoderOffsetRadKey)){
+            Preferences.setDouble(DriveConstants.kBackRightDriveAbsoluteEncoderOffsetRadKey, DriveConstants.kBackRightDriveAbsoluteEncoderOffsetRad);    
+        }
+        if(!Preferences.containsKey(DriveConstants.kFrontRightDriveAbsoluteEncoderOffsetRadKey)){
+            Preferences.setDouble(DriveConstants.kFrontRightDriveAbsoluteEncoderOffsetRadKey, DriveConstants.kFrontRightDriveAbsoluteEncoderOffsetRad);    
+        }
+        if(!Preferences.containsKey(DriveConstants.kFrontLeftDriveAbsoluteEncoderOffsetRadKey)){
+            Preferences.setDouble(DriveConstants.kFrontLeftDriveAbsoluteEncoderOffsetRadKey, DriveConstants.kFrontLeftDriveAbsoluteEncoderOffsetRad);    
+        }
+
+
         this.gyro = gyro;
         Joystick driver = new Joystick(0);
-        frontRight = new SwerveModule(DriveConstants.kFrontRightDriveMotorPort, DriveConstants.kFrontRightTurningMotorPort, DriveConstants.kFrontRightDriveAbsoluteEncoderPort, DriveConstants.kFrontRightDriveAbsoluteEncoderOffsetRad, DriveConstants.kFrontRightDriveEncoderReversed, DriveConstants.kFrontRightTurningEncoderReversed);
+        frontRight = new SwerveModule(DriveConstants.kFrontRightDriveMotorPort, DriveConstants.kFrontRightTurningMotorPort, DriveConstants.kFrontRightDriveAbsoluteEncoderPort, DriveConstants.kFrontRightDriveAbsoluteEncoderOffsetRadKey, DriveConstants.kFrontRightDriveEncoderReversed, DriveConstants.kFrontRightTurningEncoderReversed);
 
-        frontLeft = new SwerveModule(DriveConstants.kFrontLeftDriveMotorPort, DriveConstants.kFrontLeftTurningMotorPort, DriveConstants.kFrontLeftDriveAbsoluteEncoderPort, DriveConstants.kFrontLeftDriveAbsoluteEncoderOffsetRad, DriveConstants.kFrontLeftDriveEncoderReversed, DriveConstants.kFrontLeftTurningEncoderReversed);
+        frontLeft = new SwerveModule(DriveConstants.kFrontLeftDriveMotorPort, DriveConstants.kFrontLeftTurningMotorPort, DriveConstants.kFrontLeftDriveAbsoluteEncoderPort, DriveConstants.kFrontLeftDriveAbsoluteEncoderOffsetRadKey, DriveConstants.kFrontLeftDriveEncoderReversed, DriveConstants.kFrontLeftTurningEncoderReversed);
 
-        backLeft = new SwerveModule(DriveConstants.kBackLeftDriveMotorPort, DriveConstants.kBackLeftTurningMotorPort, DriveConstants.kBackLeftDriveAbsoluteEncoderPort, DriveConstants.kBackLeftDriveAbsoluteEncoderOffsetRad, DriveConstants.kBackLeftDriveEncoderReversed, DriveConstants.kBackLeftTurningEncoderReversed);
+        backLeft = new SwerveModule(DriveConstants.kBackLeftDriveMotorPort, DriveConstants.kBackLeftTurningMotorPort, DriveConstants.kBackLeftDriveAbsoluteEncoderPort, DriveConstants.kBackLeftDriveAbsoluteEncoderOffsetRadKey, DriveConstants.kBackLeftDriveEncoderReversed, DriveConstants.kBackLeftTurningEncoderReversed);
 
-        backRight = new SwerveModule(DriveConstants.kBackRightDriveMotorPort, DriveConstants.kBackRightTurningMotorPort, DriveConstants.kBackRightDriveAbsoluteEncoderPort, DriveConstants.kBackRightDriveAbsoluteEncoderOffsetRad, DriveConstants.kBackRightDriveEncoderReversed, DriveConstants.kBackRightTurningEncoderReversed);
+        backRight = new SwerveModule(DriveConstants.kBackRightDriveMotorPort, DriveConstants.kBackRightTurningMotorPort, DriveConstants.kBackRightDriveAbsoluteEncoderPort, DriveConstants.kBackRightDriveAbsoluteEncoderOffsetRadKey, DriveConstants.kBackRightDriveEncoderReversed, DriveConstants.kBackRightTurningEncoderReversed);
 
         //driveTrainSubsystem = new DriveTrainSubsystem(mod0,mod1,mod2,mod3);
         swerveSubsystem = new SwerveSubsystem(frontLeft, backLeft, frontRight, backRight, gyro);
@@ -39,10 +57,12 @@ public class Drive {
             () -> -driver.getRawAxis(1), 
             () -> driver.getRawAxis(0), 
             () -> -driver.getRawAxis(4), 
-            () -> !driver.getRawButton(1)
+            () -> !driver.getRawButton(XboxController.Button.kX.ordinal())
         ));
         
-        new JoystickButton(driver, 2).whenPressed(() -> swerveSubsystem.zeroHeading());
+        new JoystickButton(driver, XboxController.Button.kA.ordinal()).whenPressed(() -> swerveSubsystem.zeroHeading());
+
+        new JoystickButton(driver, XboxController.Button.kB.ordinal()).whenPressed(new InstantCommand(swerveSubsystem::resetEncoders,swerveSubsystem));
 
 
         //driving = new Driving(driveTrainSubsystem, driver);

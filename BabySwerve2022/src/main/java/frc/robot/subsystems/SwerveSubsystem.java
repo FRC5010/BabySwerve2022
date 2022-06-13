@@ -64,6 +64,14 @@ public class SwerveSubsystem extends SubsystemBase {
     frontLeft.stop();
   }
 
+  public void resetEncoders(){
+    zeroHeading();
+    backRight.resetEncoders();
+    backLeft.resetEncoders();
+    frontLeft.resetEncoders();
+    frontRight.resetEncoders();
+  }
+
   public void setModuleStates(SwerveModuleState[] desiredStates){
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
     frontLeft.setDesiredState(desiredStates[0]);
