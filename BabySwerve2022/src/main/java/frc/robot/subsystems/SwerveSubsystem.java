@@ -22,11 +22,11 @@ public class SwerveSubsystem extends SubsystemBase {
 
   private AHRS gyro;
 
-  public SwerveSubsystem(SwerveModule frontLeft,SwerveModule backLeft,SwerveModule frontRight,SwerveModule backRight, AHRS gyro) {
-    this.backRight = backRight;
+  public SwerveSubsystem(SwerveModule frontLeft,SwerveModule frontRight,SwerveModule backLeft,SwerveModule backRight, AHRS gyro) {
+    this.frontLeft = frontLeft;
     this.frontRight = frontRight;
     this.backLeft = backLeft;
-    this.frontLeft = frontLeft;
+    this.backRight = backRight;
 
     this.gyro = gyro;
 
@@ -58,18 +58,18 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public void stopModules(){
-    backRight.stop();
+    frontLeft.stop();
     frontRight.stop();
     backLeft.stop();
-    frontLeft.stop();
+    backRight.stop();
   }
 
   public void resetEncoders(){
     zeroHeading();
-    backRight.resetEncoders();
-    backLeft.resetEncoders();
     frontLeft.resetEncoders();
     frontRight.resetEncoders();
+    backLeft.resetEncoders();
+    backRight.resetEncoders();
   }
 
   public void setModuleStates(SwerveModuleState[] desiredStates){
