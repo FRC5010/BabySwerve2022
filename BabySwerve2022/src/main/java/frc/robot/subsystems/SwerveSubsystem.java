@@ -79,4 +79,12 @@ public class SwerveSubsystem extends SubsystemBase {
     backLeft.setDesiredState(desiredStates[2]);
     backRight.setDesiredState(desiredStates[3]);
   }
+
+  @Override
+  public void simulationPeriodic() {
+    frontLeft.simulationPeriodic();
+    frontRight.simulationPeriodic();
+    backLeft.simulationPeriodic();
+    backRight.simulationPeriodic();
+  }
 }

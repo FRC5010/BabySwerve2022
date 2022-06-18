@@ -13,10 +13,15 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.DriveConstants;
 import frc.robot.ModuleConstants;
@@ -40,19 +45,23 @@ public class SwerveModule extends SubsystemBase {
   private final boolean drivingEncoderReversed;
   private final boolean absoluteEncoderReversed;
   private final boolean turningEncoderReversed;
-  private final String absoluteEncoderOffsetRadKey;
+  private final String moduleKey;
 
   private double angleSetPoint;
 
-  public SwerveModule(int driveID, int turningID ,int absEncoderPort, String radOffsetKey, boolean driveReversed, boolean turningReversed) {
+  private MechanismRoot2d simRoot;
+  private final MechanismLigament2d simDial;
+  private final MechanismLigament2d absSimDial;
+
+  public SwerveModule(int driveID, int turningID, int absEncoderPort, String radOffsetKey, 
+    boolean driveReversed, boolean turningReversed, MechanismRoot2d simRoot) {
     
     this.absoluteEncoderPort = absEncoderPort;
-    absoluteEncoderOffsetRadKey = radOffsetKey;
+    moduleKey = radOffsetKey;
     absoluteEncoderReversed = turningReversed;
     turningEncoderReversed = turningReversed;
     drivingEncoderReversed = driveReversed;
-    
-    
+        
     this.driveMotor = new CANSparkMax(driveID, MotorType.kBrushless);
     driveMotor.setInverted(drivingEncoderReversed);
     this.turningMotor = new CANSparkMax(turningID, MotorType.kBrushless);
@@ -80,6 +89,12 @@ public class SwerveModule extends SubsystemBase {
     turningController.enableContinuousInput(-Math.PI, Math.PI);
 
     resetEncoders();
+
+    this.simRoot = simRoot;
+    simDial = simRoot.append(
+      new MechanismLigament2d(moduleKey, 10.0, 0.0, 6.0, new Color8Bit(Color.kYellow)));
+    absSimDial = simRoot.append(
+      new MechanismLigament2d(moduleKey+"Abs", 10, 0, 6, new Color8Bit(Color.kBlue)));
   }
 
   public void setSpeedMotor(double speed){
@@ -112,7 +127,7 @@ public class SwerveModule extends SubsystemBase {
   public double getAbsoluteEncoderRad(){
     double angle = absoluteEncoder.getVoltage() / RobotController.getVoltage5V();
     angle *= 2 * Math.PI;
-    angle -= Preferences.getDouble(absoluteEncoderOffsetRadKey, 0);
+    angle -= Preferences.getDouble(moduleKey, 0);
     return angle *= (absoluteEncoderReversed ? -1.0 : 1.0);
   }
 
@@ -132,7 +147,8 @@ public class SwerveModule extends SubsystemBase {
     // getTurningPosition()
     // adding ks to get swerve moving
     turningMotor.set(turnPow + (Math.signum(turnPow) * ModuleConstants.kS));
-    SmartDashboard.putString("Swerve [" + absoluteEncoder.getChannel() + "] state", state.toString());
+    SmartDashboard.putString("Swerve [" + absoluteEncoder.getChannel() + "] state", 
+      "Angle: " + state.angle.getDegrees() + " Speed m/s: " + state.speedMetersPerSecond);
   }
 
   public void stop(){
@@ -172,8 +188,9 @@ public class SwerveModule extends SubsystemBase {
   double greatestVal = 0;
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Swerve: " + absoluteEncoderPort, this.getTurningPosition());
-    SmartDashboard.putNumber("Swerve Angle: " + absoluteEncoderPort, this.getAbsoluteEncoderRad());
+    SmartDashboard.putNumber("Motor Ang: " + absoluteEncoderPort, Units.radiansToDegrees(getTurningPosition()));
+    SmartDashboard.putNumber("Abs Angle: " + absoluteEncoderPort, Units.radiansToDegrees(getAbsoluteEncoderRad()));
+    SmartDashboard.putNumber("Abs Rads: " + absoluteEncoderPort, getAbsoluteEncoderRad());
     // This method will be called once per scheduler run
   }
 }

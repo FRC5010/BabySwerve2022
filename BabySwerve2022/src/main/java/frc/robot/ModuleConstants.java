@@ -19,7 +19,7 @@ public class ModuleConstants {
     public static double kA = kAC / 60 / 1 / (12 - kS);
 
     // pid values for the neo 550
-    public static final double kPTurning = 0.052037 * 1.5;
+    public static final double kPTurning = 0.052037 * 4;
     public static final double kITurning = 0;
     public static final double kDTurning = 0;
 

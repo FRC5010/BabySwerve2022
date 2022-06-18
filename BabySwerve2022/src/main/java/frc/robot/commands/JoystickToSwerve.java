@@ -59,8 +59,7 @@ public class JoystickToSwerve extends CommandBase {
     // convert to chassis speed class
     ChassisSpeeds chassisSpeeds;
     // 
-    if(false //fieldOrientedDrive.get()
-    ){
+    if(fieldOrientedDrive.get()){
       chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
         xSpeed, 
         ySpeed, 
