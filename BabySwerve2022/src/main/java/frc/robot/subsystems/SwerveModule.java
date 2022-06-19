@@ -49,12 +49,13 @@ public class SwerveModule extends SubsystemBase {
 
   private double angleSetPoint;
 
-  private MechanismRoot2d simRoot;
-  private final MechanismLigament2d simDial;
-  private final MechanismLigament2d absSimDial;
+  private MechanismRoot2d visualRoot;
+  private final MechanismLigament2d motorDial;
+  private final MechanismLigament2d absEncDial;
+  private final MechanismLigament2d expectDial;
 
   public SwerveModule(int driveID, int turningID, int absEncoderPort, String radOffsetKey, 
-    boolean driveReversed, boolean turningReversed, MechanismRoot2d simRoot) {
+    boolean driveReversed, boolean turningReversed, MechanismRoot2d visualRoot) {
     
     this.absoluteEncoderPort = absEncoderPort;
     moduleKey = radOffsetKey;
@@ -90,12 +91,14 @@ public class SwerveModule extends SubsystemBase {
 
     resetEncoders();
 
-    this.simRoot = simRoot;
-    simDial = simRoot.append(
-      new MechanismLigament2d(moduleKey, 10.0, 0.0, 6.0, new Color8Bit(Color.kYellow)));
-    absSimDial = simRoot.append(
-      new MechanismLigament2d(moduleKey+"Abs", 10, 0, 6, new Color8Bit(Color.kBlue)));
-  }
+    this.visualRoot = visualRoot;
+    motorDial = visualRoot.append(
+      new MechanismLigament2d(moduleKey, 10.0, 90, 6.0, new Color8Bit(Color.kYellow)));
+    absEncDial = visualRoot.append(
+      new MechanismLigament2d(moduleKey+"Abs", 10, 90, 6, new Color8Bit(Color.kBlue)));
+    expectDial = visualRoot.append(
+        new MechanismLigament2d(moduleKey+"Exp", 10, 90, 6, new Color8Bit(Color.kRed)));
+    }
 
   public void setSpeedMotor(double speed){
     driveMotor.set(speed);
@@ -135,20 +138,25 @@ public class SwerveModule extends SubsystemBase {
     return new SwerveModuleState(getDriveVelocity(), new Rotation2d(getTurningPosition()));
   }
 
-  public void setDesiredState(SwerveModuleState state){
+  public boolean setDesiredState(SwerveModuleState state, boolean ready){
     if(Math.abs(state.speedMetersPerSecond) < 0.001){
       stop();
-      return;
+      return true;
     }
 
     state = SwerveModuleState.optimize(state, getState().angle);
-    driveMotor.set(state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
+    if (ready) {
+      driveMotor.set(state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
+      expectDial.setLength(50 * driveMotor.get());
+    }
     double turnPow = turningController.calculate(getTurningPosition(),state.angle.getRadians());
     // getTurningPosition()
     // adding ks to get swerve moving
     turningMotor.set(turnPow + (Math.signum(turnPow) * ModuleConstants.kS));
     SmartDashboard.putString("Swerve [" + absoluteEncoder.getChannel() + "] state", 
       "Angle: " + state.angle.getDegrees() + " Speed m/s: " + state.speedMetersPerSecond);
+    expectDial.setAngle(state.angle.getDegrees() + 90);
+    return (turnPow < 0.1);  
   }
 
   public void stop(){
@@ -188,9 +196,14 @@ public class SwerveModule extends SubsystemBase {
   double greatestVal = 0;
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Motor Ang: " + absoluteEncoderPort, Units.radiansToDegrees(getTurningPosition()));
-    SmartDashboard.putNumber("Abs Angle: " + absoluteEncoderPort, Units.radiansToDegrees(getAbsoluteEncoderRad()));
+    double turningDeg = Units.radiansToDegrees(getTurningPosition()) + 90;
+    double absEncDeg = Units.radiansToDegrees(getAbsoluteEncoderRad()) + 90;
+    SmartDashboard.putNumber("Motor Ang: " + absoluteEncoderPort, turningDeg);
+    SmartDashboard.putNumber("Abs Angle: " + absoluteEncoderPort, absEncDeg);
     SmartDashboard.putNumber("Abs Rads: " + absoluteEncoderPort, getAbsoluteEncoderRad());
     // This method will be called once per scheduler run
+    absEncDial.setAngle(absEncDeg);
+    motorDial.setAngle(turningDeg);
+    motorDial.setLength(50 * turningMotor.get());
   }
 }

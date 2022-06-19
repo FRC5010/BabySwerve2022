@@ -21,6 +21,7 @@ public class SwerveSubsystem extends SubsystemBase {
   private SwerveModule frontLeft;
 
   private AHRS gyro;
+  private boolean ready = false;
 
   public SwerveSubsystem(SwerveModule frontLeft,SwerveModule frontRight,SwerveModule backLeft,SwerveModule backRight, AHRS gyro) {
     this.frontLeft = frontLeft;
@@ -40,11 +41,12 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public void zeroHeading(){
+    System.out.println("------ Zeroing the heading -----");
     gyro.reset();
   }
 
   public double getHeading(){
-    return Math.IEEEremainder(gyro.getAngle(), 360);
+    return Math.IEEEremainder(-gyro.getAngle(), 360);
   }
 
   public Rotation2d getRotation2d(){
@@ -64,8 +66,7 @@ public class SwerveSubsystem extends SubsystemBase {
     backRight.stop();
   }
 
-  public void resetEncoders(){
-    zeroHeading();
+  public void resetEncoders() {
     frontLeft.resetEncoders();
     frontRight.resetEncoders();
     backLeft.resetEncoders();
@@ -74,10 +75,12 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public void setModuleStates(SwerveModuleState[] desiredStates){
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
-    frontLeft.setDesiredState(desiredStates[0]);
-    frontRight.setDesiredState(desiredStates[1]);
-    backLeft.setDesiredState(desiredStates[2]);
-    backRight.setDesiredState(desiredStates[3]);
+    boolean isReady = true;
+    isReady &= frontLeft.setDesiredState(desiredStates[0], ready);
+    isReady &= frontRight.setDesiredState(desiredStates[1], ready);
+    isReady &= backLeft.setDesiredState(desiredStates[2], ready);
+    isReady &= backRight.setDesiredState(desiredStates[3], ready);
+    ready = isReady;
   }
 
   @Override

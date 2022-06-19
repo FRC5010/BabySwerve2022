@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -33,11 +34,11 @@ public class Drive {
     AHRS gyro;
     private Button zeroHeading;
     private Button resetEncoders;
-    private final Mechanism2d mech2dSim = new Mechanism2d(60, 60);
-    private final MechanismRoot2d frontLeftSimPt = mech2dSim.getRoot(DriveConstants.kFrontLeftKey, 40, 20);
-    private final MechanismRoot2d frontRightSimPt = mech2dSim.getRoot(DriveConstants.kFrontLeftKey, 40, 40);
-    private final MechanismRoot2d backLeftSimPt = mech2dSim.getRoot(DriveConstants.kFrontLeftKey, 20, 20);
-    private final MechanismRoot2d backRightSimPt = mech2dSim.getRoot(DriveConstants.kFrontLeftKey, 20, 40);
+    private final Mechanism2d mech2dVisual = new Mechanism2d(60, 60);
+    private final MechanismRoot2d frontLeftVisPt = mech2dVisual.getRoot(DriveConstants.kFrontLeftKey, 45, 15);
+    private final MechanismRoot2d frontRightVisPt = mech2dVisual.getRoot(DriveConstants.kFrontRightKey, 45, 45);
+    private final MechanismRoot2d backLeftVisPt = mech2dVisual.getRoot(DriveConstants.kBackLeftKey, 15, 15);
+    private final MechanismRoot2d backRightVisPt = mech2dVisual.getRoot(DriveConstants.kBackRightKey, 15, 45);
             
     public Drive(AHRS gyro){
 
@@ -53,6 +54,7 @@ public class Drive {
         if(!Preferences.containsKey(DriveConstants.kBackRightKey)){
             Preferences.setDouble(DriveConstants.kBackRightKey, DriveConstants.kBackRightAbsoluteOffsetRad);    
         }
+        SmartDashboard.putData("Swerve Sim", mech2dVisual);
 
         this.gyro = gyro;
         Joystick driver = new Joystick(0);
@@ -62,28 +64,28 @@ public class Drive {
             DriveConstants.kFrontLeftKey, 
             DriveConstants.kFrontLeftDriveEncoderReversed, 
             DriveConstants.kFrontLeftTurningEncoderReversed,
-            frontLeftSimPt);
+            frontLeftVisPt);
         frontRight = new SwerveModule(DriveConstants.kFrontRightDriveMotorPort, 
             DriveConstants.kFrontRightTurningMotorPort, 
             DriveConstants.kFrontRightAbsolutePort, 
             DriveConstants.kFrontRightKey, 
             DriveConstants.kFrontRightDriveEncoderReversed, 
             DriveConstants.kFrontRightTurningEncoderReversed,
-            frontRightSimPt);
+            frontRightVisPt);
         backLeft = new SwerveModule(DriveConstants.kBackLeftDriveMotorPort, 
             DriveConstants.kBackLeftTurningMotorPort, 
             DriveConstants.kBackLeftAbsolutePort, 
             DriveConstants.kBackLeftKey, 
             DriveConstants.kBackLeftDriveEncoderReversed, 
             DriveConstants.kBackLeftTurningEncoderReversed,
-            backLeftSimPt);
+            backLeftVisPt);
         backRight = new SwerveModule(DriveConstants.kBackRightDriveMotorPort, 
             DriveConstants.kBackRightTurningMotorPort, 
             DriveConstants.kBackRightAbsolutePort, 
             DriveConstants.kBackRightKey, 
             DriveConstants.kBackRightDriveEncoderReversed, 
             DriveConstants.kBackRightTurningEncoderReversed,
-            backRightSimPt);
+            backRightVisPt);
 
         //driveTrainSubsystem = new DriveTrainSubsystem(mod0,mod1,mod2,mod3);
         swerveSubsystem = new SwerveSubsystem(frontLeft, frontRight, backLeft, backRight, gyro);
