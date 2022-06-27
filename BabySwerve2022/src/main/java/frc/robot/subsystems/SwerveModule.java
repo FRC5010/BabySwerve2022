@@ -64,8 +64,13 @@ public class SwerveModule extends SubsystemBase {
     drivingEncoderReversed = driveReversed;
         
     this.driveMotor = new CANSparkMax(driveID, MotorType.kBrushless);
+    driveMotor.restoreFactoryDefaults();
+    driveMotor.setSmartCurrentLimit(ModuleConstants.neoCurrentLimit);
     driveMotor.setInverted(drivingEncoderReversed);
+
     this.turningMotor = new CANSparkMax(turningID, MotorType.kBrushless);
+    turningMotor.restoreFactoryDefaults();
+    turningMotor.setSmartCurrentLimit(ModuleConstants.neo550CurrentLimit);
     turningMotor.setInverted(turningEncoderReversed);
 
     this.turningEncoder = turningMotor.getEncoder();

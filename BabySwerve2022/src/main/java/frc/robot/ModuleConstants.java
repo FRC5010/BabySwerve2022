@@ -36,4 +36,8 @@ public class ModuleConstants {
     public static final double maxAbsEncoderVolts = 4.815;
     public static final double voltsToDegrees = (360/maxAbsEncoderVolts);
     public static final double voltsToRadians = (2*Math.PI/maxAbsEncoderVolts);
+    
+    // limits
+    public static final int neoCurrentLimit = 60;
+    public static final int neo550CurrentLimit = 30;
 }
