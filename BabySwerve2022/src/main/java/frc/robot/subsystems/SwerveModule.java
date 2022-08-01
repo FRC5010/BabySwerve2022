@@ -66,6 +66,7 @@ public class SwerveModule extends SubsystemBase {
     this.driveMotor = new CANSparkMax(driveID, MotorType.kBrushless);
     driveMotor.restoreFactoryDefaults();
     driveMotor.setSmartCurrentLimit(ModuleConstants.neoCurrentLimit);
+    driveMotor.setOpenLoopRampRate(1);
     driveMotor.setInverted(drivingEncoderReversed);
 
     this.turningMotor = new CANSparkMax(turningID, MotorType.kBrushless);
@@ -161,7 +162,7 @@ public class SwerveModule extends SubsystemBase {
     SmartDashboard.putString("Swerve [" + absoluteEncoder.getChannel() + "] state", 
       "Angle: " + state.angle.getDegrees() + " Speed m/s: " + state.speedMetersPerSecond);
     expectDial.setAngle(state.angle.getDegrees() + 90);
-    return (turnPow < 0.1);  
+    return (turnPow < 0.05);  
   }
 
   public void stop(){
