@@ -100,4 +100,8 @@ public class Drive {
 
         resetEncoders = new JoystickButton(driver, XboxController.Button.kB.value).whenPressed(new InstantCommand(swerveSubsystem::resetEncoders,swerveSubsystem));
     }
+
+    public SwerveSubsystem getSwerveSubsystem(){
+        return swerveSubsystem;
+    }
 }

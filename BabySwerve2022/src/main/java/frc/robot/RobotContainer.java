@@ -5,12 +5,24 @@
 package frc.robot;
 
 import com.kauailabs.navx.frc.AHRS;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.mechanisms.Drive;
+import frc.robot.subsystems.SwerveSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -23,6 +35,9 @@ public class RobotContainer {
   Drive drive;
 
   AHRS gyro;
+
+  SwerveSubsystem swerveSubsystem;
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     gyro = new AHRS(Port.kMXP);
@@ -46,6 +61,35 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return null;
+    TrajectoryConfig trajectoryConfig = new TrajectoryConfig(AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared)
+    .setKinematics(DriveConstants.kDriveKinematics);
+
+    Trajectory trajectory = PathPlanner.loadPath("Working Path",AutoConstants.kMaxSpeedMetersPerSecond,AutoConstants.kMaxAccelerationMetersPerSecondSquared);
+
+    PIDController xController = new PIDController(AutoConstants.kPXController, 0, 0);
+    PIDController yController = new PIDController(AutoConstants.kPYController, 0, 0);
+
+    ProfiledPIDController thetaController = new ProfiledPIDController(AutoConstants.kThetaController, 0, 0, AutoConstants.kThetaControllerConstrants);
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
+
+    swerveSubsystem = drive.getSwerveSubsystem();
+
+    SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
+      trajectory,
+      swerveSubsystem::getPose2d, 
+      DriveConstants.kDriveKinematics, 
+      xController, 
+      yController, 
+      thetaController, 
+      swerveSubsystem::setModuleStates, 
+      swerveSubsystem
+    );
+
+    return new SequentialCommandGroup(
+      new InstantCommand(() -> swerveSubsystem.resetOdometry(trajectory.getInitialPose())),
+      swerveControllerCommand,
+      new InstantCommand(() -> swerveSubsystem.stopModules())
+
+    );
   }
 }

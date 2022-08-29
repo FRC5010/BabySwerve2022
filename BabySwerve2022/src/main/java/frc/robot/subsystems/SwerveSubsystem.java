@@ -6,8 +6,10 @@ package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -21,6 +23,7 @@ public class SwerveSubsystem extends SubsystemBase {
   private SwerveModule frontLeft;
 
   private AHRS gyro;
+  private final SwerveDriveOdometry odometer = new SwerveDriveOdometry(DriveConstants.kDriveKinematics, new Rotation2d(0));
   private boolean ready = false;
 
   public SwerveSubsystem(SwerveModule frontLeft,SwerveModule frontRight,SwerveModule backLeft,SwerveModule backRight, AHRS gyro) {
@@ -30,6 +33,8 @@ public class SwerveSubsystem extends SubsystemBase {
     this.backRight = backRight;
 
     this.gyro = gyro;
+
+    
 
     new Thread(() -> {
       try{
@@ -53,9 +58,18 @@ public class SwerveSubsystem extends SubsystemBase {
     return Rotation2d.fromDegrees(getHeading());
   }
 
+  public Pose2d getPose2d(){
+    return odometer.getPoseMeters();
+  }
+
+  public void resetOdometry(Pose2d pose){
+    odometer.resetPosition(pose, pose.getRotation());
+  }
+
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Robot Heading", getHeading());
+    odometer.update(getRotation2d(), frontLeft.getState(), frontRight.getState(), backLeft.getState(), backRight.getState());
     // This method will be called once per scheduler run
   }
 
