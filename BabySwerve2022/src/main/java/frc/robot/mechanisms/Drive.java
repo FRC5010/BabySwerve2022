@@ -6,6 +6,8 @@ package frc.robot.mechanisms;
 
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Preferences;
@@ -20,6 +22,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.DriveConstants;
+import frc.robot.FRC5010.DrivetrainPoseEstimator;
+import frc.robot.FRC5010.GenericGyro;
+import frc.robot.FRC5010.Vision.VisionPhotonCamera;
 import frc.robot.commands.JoystickToSwerve;
 import frc.robot.subsystems.SwerveModule;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -31,7 +36,7 @@ public class Drive {
     SwerveModule backLeft;
     SwerveModule backRight;
     private SwerveSubsystem swerveSubsystem;
-    AHRS gyro;
+    static GenericGyro gyro;
     private Button zeroHeading;
     private Button resetEncoders;
     private final Mechanism2d mech2dVisual = new Mechanism2d(60, 60);
@@ -39,8 +44,10 @@ public class Drive {
     private final MechanismRoot2d frontRightVisPt = mech2dVisual.getRoot(DriveConstants.kFrontRightKey, 45, 45);
     private final MechanismRoot2d backLeftVisPt = mech2dVisual.getRoot(DriveConstants.kBackLeftKey, 15, 15);
     private final MechanismRoot2d backRightVisPt = mech2dVisual.getRoot(DriveConstants.kBackRightKey, 15, 45);
-            
-    public Drive(AHRS gyro){
+    private DrivetrainPoseEstimator drivetrainPoseEstimator;        
+    private VisionPhotonCamera vision;
+
+    public Drive(GenericGyro gyro){
 
         if(!Preferences.containsKey(DriveConstants.kFrontLeftKey)){
             Preferences.setDouble(DriveConstants.kFrontLeftKey, DriveConstants.kFrontLeftAbsoluteOffsetRad);    
@@ -99,9 +106,47 @@ public class Drive {
         zeroHeading = new JoystickButton(driver, XboxController.Button.kA.value).whenPressed(() -> swerveSubsystem.zeroHeading());
 
         resetEncoders = new JoystickButton(driver, XboxController.Button.kB.value).whenPressed(new InstantCommand(swerveSubsystem::resetEncoders,swerveSubsystem));
+        vision = new VisionPhotonCamera("Global_Shutter_Camera", Units.inchesToMeters(16.75), 0, 0, 1, "Driver");
+        drivetrainPoseEstimator = new DrivetrainPoseEstimator(this, vision);
     }
 
     public SwerveSubsystem getSwerveSubsystem(){
         return swerveSubsystem;
     }
+
+    /**
+   * Current angle of the Romi around the X-axis.
+   *
+   * @return The current angle of the Romi in degrees
+   */
+  public double getGyroAngleX() {
+    return gyro.getAngleX();
+  }
+
+  /**
+   * Current angle of the Romi around the Y-axis.
+   *
+   * @return The current angle of the Romi in degrees
+   */
+  public double getGyroAngleY() {
+    return gyro.getAngleY();
+  }
+
+  /**
+   * Current angle of the Romi around the Z-axis.
+   *
+   * @return The current angle of the Romi in degrees
+   */
+  public double getGyroAngleZ() {
+    return gyro.getAngleZ();
+  }
+
+  public Rotation2d getGyroRotation2d() {
+    return new Rotation3d(getGyroAngleX(), getGyroAngleY(), getGyroAngleZ()).toRotation2d();
+  }
+
+  /** Reset the gyro. */
+  public void resetGyro() {
+    gyro.reset();
+  }
 }

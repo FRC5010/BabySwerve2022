@@ -16,9 +16,15 @@
       "/LiveWindow/Ungrouped/PIDController[4]": "PIDController",
       "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
       "/LiveWindow/Ungrouped/navX-Sensor[1]": "Gyro",
+      "/Shuffleboard/Pose/Field": "Field2d",
       "/SmartDashboard/Swerve Sim": "Mechanism2d"
     },
     "windows": {
+      "/Shuffleboard/Pose/Field": {
+        "window": {
+          "visible": true
+        }
+      },
       "/SmartDashboard/Swerve Sim": {
         "window": {
           "visible": true
