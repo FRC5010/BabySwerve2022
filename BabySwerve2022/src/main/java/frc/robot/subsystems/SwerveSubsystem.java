@@ -8,11 +8,14 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.DriveConstants;
 import frc.robot.FRC5010.GenericGyro;
+import frc.robot.mechanisms.Drive;
 
 public class SwerveSubsystem extends SubsystemBase {
   /** Creates a new SwerveSubsystem. */
@@ -22,19 +25,30 @@ public class SwerveSubsystem extends SubsystemBase {
   private SwerveModule frontLeft;
 
   private GenericGyro gyro;
-  private final SwerveDriveOdometry odometer = new SwerveDriveOdometry(DriveConstants.kDriveKinematics, new Rotation2d(0));
   private boolean ready = false;
+  private final SwerveDriveOdometry odometer;  
+  private final Pose2d pose2d = new Pose2d(); 
+  private SwerveModulePosition[] modulePositions; 
 
   public SwerveSubsystem(SwerveModule frontLeft,SwerveModule frontRight,SwerveModule backLeft,SwerveModule backRight, GenericGyro gyro) {
     this.frontLeft = frontLeft;
     this.frontRight = frontRight;
     this.backLeft = backLeft;
     this.backRight = backRight;
-
     this.gyro = gyro;
 
-    
 
+    modulePositions = new SwerveModulePosition[] {
+      new SwerveModulePosition(0, new Rotation2d(Units.radiansToDegrees(this.frontLeft.getAbsoluteEncoderRad()))), 
+      new SwerveModulePosition(0, new Rotation2d(Units.radiansToDegrees(this.frontRight.getAbsoluteEncoderRad()))), 
+      new SwerveModulePosition(0, new Rotation2d(Units.radiansToDegrees(this.backLeft.getAbsoluteEncoderRad()))), 
+      new SwerveModulePosition(0, new Rotation2d(Units.radiansToDegrees(this.backRight.getAbsoluteEncoderRad())))
+    };
+  
+    odometer = new SwerveDriveOdometry(DriveConstants.kDriveKinematics, new Rotation2d(), modulePositions);
+
+    // = new SwerveDriveOdometry(DriveConstants.kDriveKinematics, new Rotation2d(0), null);
+  
     new Thread(() -> {
       try{
         Thread.sleep(1000);
@@ -43,7 +57,11 @@ public class SwerveSubsystem extends SubsystemBase {
     }).start();
 
   }
-
+  
+  public SwerveModulePosition[] getModulePositions(){
+    return this.modulePositions; 
+  }
+  
   public void zeroHeading(){
     System.out.println("------ Zeroing the heading -----");
     gyro.reset();
@@ -62,13 +80,13 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public void resetOdometry(Pose2d pose){
-    odometer.resetPosition(pose, pose.getRotation());
+    odometer.resetPosition(getRotation2d(), modulePositions, pose2d);
   }
 
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Robot Heading", getHeading());
-    odometer.update(getRotation2d(), frontLeft.getState(), frontRight.getState(), backLeft.getState(), backRight.getState());
+    odometer.update(getRotation2d(), modulePositions);
     // This method will be called once per scheduler run
   }
 

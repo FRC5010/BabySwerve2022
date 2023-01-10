@@ -7,8 +7,13 @@ package frc.robot.FRC5010;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N5;
@@ -23,6 +28,7 @@ import frc.robot.FRC5010.Vision.AprilTags.AprilTag;
 import frc.robot.FRC5010.Vision.VisionConstants;
 import frc.robot.FRC5010.Vision.VisionValuesPhotonCamera;
 import frc.robot.mechanisms.Drive;
+import frc.robot.subsystems.SwerveSubsystem;
 
 /** Add your docs here. */
 public class DrivetrainPoseEstimator extends SubsystemBase {
@@ -34,22 +40,32 @@ public class DrivetrainPoseEstimator extends SubsystemBase {
   // will have a stronger
   // influence on the final pose estimate.
   Matrix<N5, N1> stateStdDevs = VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5), 0.05, 0.05);
-  Matrix<N3, N1> localMeasurementStdDevs = VecBuilder.fill(0.01, 0.01, Units.degreesToRadians(0.1));
+  Matrix<N3, N1> localMeasurementStdDevs = VecBuilder.fill(0.01, 0.01, Units.degreesToRadians(0.1));   
   Matrix<N3, N1> visionMeasurementStdDevs = VecBuilder.fill(0.01, 0.01, Units.degreesToRadians(0.1));
   private Drive driveTrain;
   private VisionSystem vision;
+  private SwerveSubsystem swerveSubsystem; 
   private final Field2d field2d = new Field2d();
+  private Translation2d[] moduleTranslations; 
+  private SwerveDriveKinematics kinematics; 
+  // private final Pose2d poseInit = new Pose2d(); 
+  private final Rotation2d rotation2d = new Rotation2d(); 
+  private final SwerveDrivePoseEstimator m_poseEstimator;
 
-  private final DifferentialDrivePoseEstimator m_poseEstimator;
-  public DrivetrainPoseEstimator(Drive driveTrain, VisionSystem vision) {
+  public DrivetrainPoseEstimator(Drive driveTrain, VisionSystem vision, SwerveSubsystem swerveSubsystem) {
     this.driveTrain = driveTrain;
     this.vision = vision;
-    m_poseEstimator = new DifferentialDrivePoseEstimator(
-        driveTrain.getGyroRotation2d(),
-        new Pose2d(),
-        stateStdDevs,
-        localMeasurementStdDevs,
-        visionMeasurementStdDevs);
+    this.swerveSubsystem = swerveSubsystem; 
+
+    moduleTranslations = new Translation2d[] {new Translation2d(), new Translation2d(), new Translation2d(), new Translation2d()}; 
+    kinematics = new SwerveDriveKinematics(moduleTranslations);
+    this.m_poseEstimator = new SwerveDrivePoseEstimator(kinematics, new Rotation2d(), 
+    this.swerveSubsystem.getModulePositions(), new Pose2d());
+    // new DifferentialDrivePoseEstimator(
+    //     driveTrain.getGyroRotation2d(),
+    //     stateStdDevs,
+    //     localMeasurementStdDevs,
+    //     visionMeasurementStdDevs);
     ShuffleboardTab tab = Shuffleboard.getTab("Pose");
     tab.addString("Pose (X,Y)", this::getFormattedPose).withPosition(0, 4);
     tab.addNumber("Pose Degrees", () -> getCurrentPose().getRotation().getDegrees()).withPosition(1, 4);
@@ -113,7 +129,7 @@ public class DrivetrainPoseEstimator extends SubsystemBase {
    * @param pose
    */
   public void resetToPose(Pose2d pose) {
-    m_poseEstimator.resetPosition(pose, driveTrain.getGyroRotation2d());
+    m_poseEstimator.resetPosition(driveTrain.getGyroRotation2d(), this.swerveSubsystem.getModulePositions(), new Pose2d());
   }
 
   /** @return The current best-guess at drivetrain position on the field. */

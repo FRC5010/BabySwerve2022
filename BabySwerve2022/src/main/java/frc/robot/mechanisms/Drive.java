@@ -107,7 +107,7 @@ public class Drive {
 
         resetEncoders = new JoystickButton(driver, XboxController.Button.kB.value).whenPressed(new InstantCommand(swerveSubsystem::resetEncoders,swerveSubsystem));
         vision = new VisionPhotonCamera("Global_Shutter_Camera", Units.inchesToMeters(16.75), 0, 0, 1, "Driver");
-        drivetrainPoseEstimator = new DrivetrainPoseEstimator(this, vision);
+        drivetrainPoseEstimator = new DrivetrainPoseEstimator(this, vision, swerveSubsystem);
     }
 
     public SwerveSubsystem getSwerveSubsystem(){
