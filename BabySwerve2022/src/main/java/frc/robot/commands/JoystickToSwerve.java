@@ -48,6 +48,7 @@ public class JoystickToSwerve extends CommandBase {
     // get values on sticks and deadzone them
     double xSpeed = SwerveModule.deadzone(xSpdFunction.get());
     double ySpeed = SwerveModule.deadzone(ySpdFunction.get());
+    
 
     double turnSpeed = SwerveModule.deadzone(turnSpdFunction.get());
 
@@ -56,25 +57,10 @@ public class JoystickToSwerve extends CommandBase {
     ySpeed = yLimiter.calculate(ySpeed) * DriveConstants.kTeleDriveMaxSpeedMetersPerSecond;
     turnSpeed = turnLimiter.calculate(turnSpeed) * DriveConstants.kTeleDriveMaxAngularSpeedRadiansPerSecond;
 
+    // System.out.println(xSpeed); 
+    System.out.println(ySpeed); 
     // convert to chassis speed class
-    ChassisSpeeds chassisSpeeds;
-    // 
-    if(fieldOrientedDrive.get()){
-      chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-        xSpeed, 
-        ySpeed, 
-        turnSpeed, 
-        swerveSubsystem.getRotation2d()
-      );
-    }else{
-      chassisSpeeds = new ChassisSpeeds(xSpeed,ySpeed,turnSpeed);
-    }
-
-    // convert chassis speed into modules speeds
-    SwerveModuleState[] moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
-
-    // output each module speed into subsystem
-    swerveSubsystem.setModuleStates(moduleStates);
+    swerveSubsystem.joystickToChassis(xSpeed, ySpeed, turnSpeed, fieldOrientedDrive);
 
   }
 

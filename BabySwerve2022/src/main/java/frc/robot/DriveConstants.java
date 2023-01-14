@@ -15,11 +15,17 @@ public class DriveConstants {
     // Distance between right and left wheels
     public static final double kWheelBase = Units.inchesToMeters(7.75);
     // Distance between front and back wheels
-    public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
+    
+    public static final Translation2d[] kDriveKinematics = new Translation2d[] {
             new Translation2d(kWheelBase / 2, kTrackWidth / 2), // front left
             new Translation2d(kWheelBase / 2, -kTrackWidth / 2), // front right
             new Translation2d(-kWheelBase / 2, kTrackWidth / 2), // back left
-            new Translation2d(-kWheelBase / 2, -kTrackWidth / 2)); // back right
+            new Translation2d(-kWheelBase / 2, -kTrackWidth / 2) // back right 
+        };
+
+    public static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(kDriveKinematics);  
+    
+
      
 
     public static final int kFrontLeftDriveMotorPort = 1;
@@ -62,11 +68,11 @@ public class DriveConstants {
     public static final double kBackLeftAbsoluteOffsetRad = 5.224; 
     public static final double kBackRightAbsoluteOffsetRad = 6.074;
 
-    public static final double kPhysicalMaxSpeedMetersPerSecond = 0.05;
-    public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = .08;
+    public static final double kPhysicalMaxSpeedMetersPerSecond = 15;
+    public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = Math.PI;
 
-    public static final double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond;
-    public static final double kTeleDriveMaxAngularSpeedRadiansPerSecond = kPhysicalMaxAngularSpeedRadiansPerSecond;
-    public static final double kTeleDriveMaxAccelerationUnitsPerSecond = .4;
+    public static final double kTeleDriveMaxSpeedMetersPerSecond = 1;
+    public static final double kTeleDriveMaxAngularSpeedRadiansPerSecond = 2.4;
+    public static final double kTeleDriveMaxAccelerationUnitsPerSecond = 1.2;
     public static final double kTeleDriveMaxAngularAccelerationUnitsPerSecond = Math.PI;
 }

@@ -160,7 +160,7 @@ public class SwerveModule extends SubsystemBase {
     // adding ks to get swerve moving
     turningMotor.set(turnPow + (Math.signum(turnPow) * ModuleConstants.kS));
     SmartDashboard.putString("Swerve [" + absoluteEncoder.getChannel() + "] state", 
-      "Angle: " + state.angle.getDegrees() + " Speed m/s: " + state.speedMetersPerSecond);
+      "Angle: " + state.angle.getDegrees() + " Speed m/s: " + state.speedMetersPerSecond + "Power: " + state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
     expectDial.setAngle(state.angle.getDegrees() + 90);
     return (turnPow < 0.05);  
   }

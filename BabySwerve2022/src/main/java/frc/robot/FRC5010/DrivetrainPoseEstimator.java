@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.DriveConstants;
 import frc.robot.FRC5010.Vision.AprilTags;
 import frc.robot.FRC5010.Vision.AprilTags.AprilTag;
 import frc.robot.FRC5010.Vision.VisionConstants;
@@ -46,9 +47,8 @@ public class DrivetrainPoseEstimator extends SubsystemBase {
   private VisionSystem vision;
   private SwerveSubsystem swerveSubsystem; 
   private final Field2d field2d = new Field2d();
-  private Translation2d[] moduleTranslations; 
-  private SwerveDriveKinematics kinematics; 
-  // private final Pose2d poseInit = new Pose2d(); 
+  // private final Pose2d poseInit = new Pose2d();
+ 
   private final Rotation2d rotation2d = new Rotation2d(); 
   private final SwerveDrivePoseEstimator m_poseEstimator;
 
@@ -56,10 +56,10 @@ public class DrivetrainPoseEstimator extends SubsystemBase {
     this.driveTrain = driveTrain;
     this.vision = vision;
     this.swerveSubsystem = swerveSubsystem; 
+  
 
-    moduleTranslations = new Translation2d[] {new Translation2d(), new Translation2d(), new Translation2d(), new Translation2d()}; 
-    kinematics = new SwerveDriveKinematics(moduleTranslations);
-    this.m_poseEstimator = new SwerveDrivePoseEstimator(kinematics, new Rotation2d(), 
+  
+    this.m_poseEstimator = new SwerveDrivePoseEstimator(DriveConstants.kinematics, new Rotation2d(), 
     this.swerveSubsystem.getModulePositions(), new Pose2d());
     // new DifferentialDrivePoseEstimator(
     //     driveTrain.getGyroRotation2d(),
@@ -99,12 +99,12 @@ public class DrivetrainPoseEstimator extends SubsystemBase {
   public void update() {
     Pose3d camPose = vision.getRawValues().getCameraPose();
     if (null != camPose) {
-      System.out.println("CamPose: X: " + camPose.getX() + " Y: " + camPose.getY() + " Z:" + camPose.getZ() + " R: " + Units.radiansToDegrees(camPose.getRotation().getAngle()));
+      // System.out.println("CamPose: X: " + camPose.getX() + " Y: " + camPose.getY() + " Z:" + camPose.getZ() + " R: " + Units.radiansToDegrees(camPose.getRotation().getAngle()));
       Pose2d robotPoseEst = camPose.transformBy(VisionConstants.kCameraToRobot).toPose2d();
       double imageCaptureTime = Timer.getFPGATimestamp() - vision.getRawValues().getLatency() / 1000.0;
       
       field2d.getObject("MyRobot" + ((VisionValuesPhotonCamera)vision.getRawValues()).getFiducialId()).setPose(robotPoseEst);    
-      System.out.println("RobotPoseEst: X: " + robotPoseEst.getX() + " Y: " + robotPoseEst.getY() + " R: " + robotPoseEst.getRotation().getDegrees());
+      // System.out.println("RobotPoseEst: X: " + robotPoseEst.getX() + " Y: " + robotPoseEst.getY() + " R: " + robotPoseEst.getRotation().getDegrees());
       //m_poseEstimator.addVisionMeasurement(robotPoseEst, imageCaptureTime);
       resetToPose(robotPoseEst);
     }

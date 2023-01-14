@@ -14,4 +14,7 @@ package frc.robot;
  */
 public final class Constants {
     
+    public static final int offBalanceThreshold = 10;
+    public static final int onBalanceThreshold  = 5;
+
 }

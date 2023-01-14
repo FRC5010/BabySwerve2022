@@ -4,8 +4,11 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -15,14 +18,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.DriveConstants;
 import frc.robot.FRC5010.GenericGyro;
-import frc.robot.mechanisms.Drive;
 
 public class SwerveSubsystem extends SubsystemBase {
   /** Creates a new SwerveSubsystem. */
   private SwerveModule backRight;
   private SwerveModule frontRight;
   private SwerveModule backLeft;
-  private SwerveModule frontLeft;
+  private SwerveModule frontLeft; 
+
 
   private GenericGyro gyro;
   private boolean ready = false;
@@ -45,7 +48,7 @@ public class SwerveSubsystem extends SubsystemBase {
       new SwerveModulePosition(0, new Rotation2d(Units.radiansToDegrees(this.backRight.getAbsoluteEncoderRad())))
     };
   
-    odometer = new SwerveDriveOdometry(DriveConstants.kDriveKinematics, new Rotation2d(), modulePositions);
+    odometer = new SwerveDriveOdometry(DriveConstants.kinematics, new Rotation2d(), modulePositions);
 
     // = new SwerveDriveOdometry(DriveConstants.kDriveKinematics, new Rotation2d(0), null);
   
@@ -63,7 +66,7 @@ public class SwerveSubsystem extends SubsystemBase {
   }
   
   public void zeroHeading(){
-    System.out.println("------ Zeroing the heading -----");
+    // System.out.println("------ Zeroing the heading -----");
     gyro.reset();
   }
 
@@ -77,6 +80,28 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public Pose2d getPose2d(){
     return odometer.getPoseMeters();
+  }
+
+  public void joystickToChassis(double xSpeed, double ySpeed, double turnSpeed, Supplier<Boolean> fieldOrientedDrive){
+
+    ChassisSpeeds chassisSpeeds;
+    // 
+    if(fieldOrientedDrive.get()){
+      chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+        xSpeed, 
+        ySpeed, 
+        turnSpeed, 
+        getRotation2d()
+      );
+    }else{
+      chassisSpeeds = new ChassisSpeeds(xSpeed,ySpeed,turnSpeed);
+    }
+
+    // convert chassis speed into modules speeds
+    SwerveModuleState[] moduleStates = DriveConstants.kinematics.toSwerveModuleStates(chassisSpeeds);
+
+    // output each module speed into subsystem
+    setModuleStates(moduleStates);
   }
 
   public void resetOdometry(Pose2d pose){

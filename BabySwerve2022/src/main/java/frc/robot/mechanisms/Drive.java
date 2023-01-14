@@ -4,8 +4,6 @@
 
 package frc.robot.mechanisms;
 
-import com.kauailabs.navx.frc.AHRS;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
@@ -13,18 +11,17 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.DriveConstants;
 import frc.robot.FRC5010.DrivetrainPoseEstimator;
 import frc.robot.FRC5010.GenericGyro;
 import frc.robot.FRC5010.Vision.VisionPhotonCamera;
+import frc.robot.commands.AutoBalance;
 import frc.robot.commands.JoystickToSwerve;
 import frc.robot.subsystems.SwerveModule;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -37,8 +34,9 @@ public class Drive {
     SwerveModule backRight;
     private SwerveSubsystem swerveSubsystem;
     static GenericGyro gyro;
-    private Button zeroHeading;
-    private Button resetEncoders;
+    private Trigger zeroHeading;
+    private Trigger resetEncoders;
+    private Trigger autoBalance; 
     private final Mechanism2d mech2dVisual = new Mechanism2d(60, 60);
     private final MechanismRoot2d frontLeftVisPt = mech2dVisual.getRoot(DriveConstants.kFrontLeftKey, 45, 15);
     private final MechanismRoot2d frontRightVisPt = mech2dVisual.getRoot(DriveConstants.kFrontRightKey, 45, 45);
@@ -102,12 +100,18 @@ public class Drive {
             () -> -driver.getRawAxis(4), 
             () -> driver.getRawButton(XboxController.Button.kRightBumper.value)
         ));
-        
-        zeroHeading = new JoystickButton(driver, XboxController.Button.kA.value).whenPressed(() -> swerveSubsystem.zeroHeading());
 
-        resetEncoders = new JoystickButton(driver, XboxController.Button.kB.value).whenPressed(new InstantCommand(swerveSubsystem::resetEncoders,swerveSubsystem));
+
+        zeroHeading = new JoystickButton(driver, XboxController.Button.kA.value).onTrue(new InstantCommand(() -> swerveSubsystem.zeroHeading()));
+
+        resetEncoders = new JoystickButton(driver, XboxController.Button.kB.value).onTrue(new InstantCommand(swerveSubsystem::resetEncoders,swerveSubsystem));
+
+        autoBalance = new JoystickButton(driver, XboxController.Button.kX.value).whileTrue(new AutoBalance(swerveSubsystem, () -> driver.getRawButton(XboxController.Button.kRightBumper.value)));
+
         vision = new VisionPhotonCamera("Global_Shutter_Camera", Units.inchesToMeters(16.75), 0, 0, 1, "Driver");
         drivetrainPoseEstimator = new DrivetrainPoseEstimator(this, vision, swerveSubsystem);
+
+
     }
 
     public SwerveSubsystem getSwerveSubsystem(){

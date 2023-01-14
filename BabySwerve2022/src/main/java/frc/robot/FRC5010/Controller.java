@@ -83,7 +83,7 @@ public class Controller {
         }
 
         public double get(){
-            System.out.println("deadzone");
+            // System.out.println("deadzone");
             double input = instance.get();
             if (input > -deadzone && input < deadzone) {
                 return 0.0;

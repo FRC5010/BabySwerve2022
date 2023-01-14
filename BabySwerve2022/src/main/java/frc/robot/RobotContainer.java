@@ -51,7 +51,10 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  private void configureButtonBindings() {}
+  private void configureButtonBindings() {
+
+    
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -61,7 +64,7 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
     TrajectoryConfig trajectoryConfig = new TrajectoryConfig(AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared)
-    .setKinematics(DriveConstants.kDriveKinematics);
+    .setKinematics(DriveConstants.kinematics);
 
     Trajectory trajectory = PathPlanner.loadPath("New Path",AutoConstants.kMaxSpeedMetersPerSecond,AutoConstants.kMaxAccelerationMetersPerSecondSquared);
 
@@ -76,14 +79,14 @@ public class RobotContainer {
     SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
       trajectory,
       swerveSubsystem::getPose2d, 
-      DriveConstants.kDriveKinematics, 
+      DriveConstants.kinematics, 
       xController, 
       yController, 
       thetaController, 
       swerveSubsystem::setModuleStates, 
       swerveSubsystem
     );
-
+    
     return new SequentialCommandGroup(
       new InstantCommand(() -> swerveSubsystem.resetOdometry(trajectory.getInitialPose())),
       swerveControllerCommand,
