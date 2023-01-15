@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.DriveConstants;
@@ -108,10 +107,8 @@ public class Drive {
 
         autoBalance = new JoystickButton(driver, XboxController.Button.kX.value).whileTrue(new AutoBalance(swerveSubsystem, () -> driver.getRawButton(XboxController.Button.kRightBumper.value)));
 
-        vision = new VisionPhotonCamera("Global_Shutter_Camera", Units.inchesToMeters(16.75), 0, 0, 1, "Driver");
+        vision = new VisionPhotonCamera("Arducam_OV9281", Units.inchesToMeters(16.75), 0, 0, 1, "Driver");
         drivetrainPoseEstimator = new DrivetrainPoseEstimator(this, vision, swerveSubsystem);
-
-
     }
 
     public SwerveSubsystem getSwerveSubsystem(){

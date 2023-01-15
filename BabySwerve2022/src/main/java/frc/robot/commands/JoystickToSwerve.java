@@ -58,7 +58,7 @@ public class JoystickToSwerve extends CommandBase {
     turnSpeed = turnLimiter.calculate(turnSpeed) * DriveConstants.kTeleDriveMaxAngularSpeedRadiansPerSecond;
 
     // System.out.println(xSpeed); 
-    System.out.println(ySpeed); 
+    //System.out.println(ySpeed); 
     // convert to chassis speed class
     swerveSubsystem.joystickToChassis(xSpeed, ySpeed, turnSpeed, fieldOrientedDrive);
 
