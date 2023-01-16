@@ -107,8 +107,8 @@ public class Drive {
         resetEncoders = new JoystickButton(driver, XboxController.Button.kB.value).onTrue(new InstantCommand(swerveSubsystem::resetEncoders,swerveSubsystem));
 
         autoBalance = new JoystickButton(driver, XboxController.Button.kX.value).whileTrue(new AutoBalance(swerveSubsystem, () -> driver.getRawButton(XboxController.Button.kRightBumper.value)));
-
-        vision = new VisionPhotonCamera("Global_Shutter_Camera", Units.inchesToMeters(16.75), 0, 0, 1, "Driver");
+        // 16.75 old cam height
+        vision = new VisionPhotonCamera("Global_Shutter_Camera", Units.inchesToMeters(50.25), 0, 0, 1, "Driver");
         drivetrainPoseEstimator = new DrivetrainPoseEstimator(this, vision, swerveSubsystem);
 
 
