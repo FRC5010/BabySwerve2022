@@ -6,18 +6,15 @@ package frc.robot.FRC5010;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N5;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -56,16 +53,9 @@ public class DrivetrainPoseEstimator extends SubsystemBase {
     this.driveTrain = driveTrain;
     this.vision = vision;
     this.swerveSubsystem = swerveSubsystem; 
-  
-
-  
-    this.m_poseEstimator = new SwerveDrivePoseEstimator(DriveConstants.kinematics, new Rotation2d(), 
+   
+    this.m_poseEstimator = new SwerveDrivePoseEstimator(DriveConstants.kinematics, rotation2d, 
     this.swerveSubsystem.getModulePositions(), new Pose2d());
-    // new DifferentialDrivePoseEstimator(
-    //     driveTrain.getGyroRotation2d(),
-    //     stateStdDevs,
-    //     localMeasurementStdDevs,
-    //     visionMeasurementStdDevs);
     ShuffleboardTab tab = Shuffleboard.getTab("Pose");
     tab.addString("Pose (X,Y)", this::getFormattedPose).withPosition(0, 4);
     tab.addNumber("Pose Degrees", () -> getCurrentPose().getRotation().getDegrees()).withPosition(1, 4);
@@ -104,18 +94,13 @@ public class DrivetrainPoseEstimator extends SubsystemBase {
       double imageCaptureTime = Timer.getFPGATimestamp() - vision.getRawValues().getLatency() / 1000.0;
       
       field2d.getObject("MyRobot" + ((VisionValuesPhotonCamera)vision.getRawValues()).getFiducialId()).setPose(robotPoseEst);    
-      // System.out.println("RobotPoseEst: X: " + robotPoseEst.getX() + " Y: " + robotPoseEst.getY() + " R: " + robotPoseEst.getRotation().getDegrees());
-      //m_poseEstimator.addVisionMeasurement(robotPoseEst, imageCaptureTime);
-      resetToPose(robotPoseEst);
+      //System.out.println("RobotPoseEst: X: " + robotPoseEst.getX() + " Y: " + robotPoseEst.getY() + " R: " + robotPoseEst.getRotation().getDegrees());
+      m_poseEstimator.addVisionMeasurement(robotPoseEst, imageCaptureTime);
     }
-    /*
-    DifferentialDriveWheelSpeeds actWheelSpeeds = new DifferentialDriveWheelSpeeds(driveTrain.getLeftEncoderRate(),
-        driveTrain.getRightEncoderRate());
-    double leftDist = driveTrain.getLeftDistance();
-    double rightDist = driveTrain.getRightDistance();
-    m_poseEstimator.updateWithTime(Timer.getFPGATimestamp(), driveTrain.getGyroRotation2d(), actWheelSpeeds, leftDist, rightDist);
-*/
-    
+
+    if (RobotBase.isReal()) {
+      m_poseEstimator.updateWithTime(Timer.getFPGATimestamp(), driveTrain.getGyroRotation2d(), swerveSubsystem.getModulePositions());
+    }
     field2d.setRobotPose(getCurrentPose());
   }
 

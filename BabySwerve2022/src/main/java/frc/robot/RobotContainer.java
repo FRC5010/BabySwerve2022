@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.PathPlanner;
 
 import edu.wpi.first.math.controller.PIDController;
