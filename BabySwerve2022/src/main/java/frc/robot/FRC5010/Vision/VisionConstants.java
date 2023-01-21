@@ -15,5 +15,5 @@ public class VisionConstants {
     public static String SBTabVisionDisplay ="Vision";
     public static final double cameraHeight = Units.inchesToMeters(3);
     public static final double cameraAngle = Units.degreesToRadians(-20);
-    public static final Transform3d kCameraToRobot = new Transform3d(new Translation3d(Units.inchesToMeters(7.125), 0.0, Units.inchesToMeters(17)), new Rotation3d(0.0, Units.degreesToRadians(-20), Units.degreesToRadians(180)));
+    public static final Transform3d kCameraToRobot = new Transform3d(new Translation3d(Units.inchesToMeters(7.125), 0.0, Units.inchesToMeters(17    )), new Rotation3d(0.0, Units.degreesToRadians(-20), Units.degreesToRadians(180)));
 }
